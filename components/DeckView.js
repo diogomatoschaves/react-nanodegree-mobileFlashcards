@@ -8,6 +8,7 @@ import { connect } from 'react-redux'
 import Button from './Button'
 import { AppLoading } from 'expo'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
+import { initializeQuiz } from '../actions/index'
 
 
 class DeckView extends Component {
@@ -19,6 +20,20 @@ class DeckView extends Component {
       title
     }
   }
+
+  state = {
+    disabled: false
+  }
+
+  componentDidMount() {
+    const { questions } = this.props
+
+    if (questions.length === 0) {
+      this.setState({ disabled: true})
+    } else {
+      this.setState({ disabled: false})
+    }
+  }
   
   onPressAddCard = () => {
     const { title } = this.props
@@ -26,8 +41,14 @@ class DeckView extends Component {
   }
   
   onPressStartQuiz = () => {
-    const { title } = this.props
-    this.props.navigation.navigate('Quiz', { title })
+
+    if (!this.state.disabled) {
+      const {title, questions, startQuiz} = this.props
+
+      startQuiz(questions)
+
+      this.props.navigation.navigate('Quiz', {title})
+    }
   }
   
   render() {
@@ -60,6 +81,8 @@ class DeckView extends Component {
             textStyle={styles.startQuizBtnText}
             onPress={this.onPressStartQuiz}
             text={'Start Quiz'}
+            activeOpacity={this.state.disabled ? 1 : 0.2}
+            extraStyle={this.state.disabled ? {backgroundColor: 'gray'} : {}}
           />
         </View>
       </ScrollView>
@@ -157,7 +180,7 @@ function mapStateToProps({ decks }, { navigation }) {
 
 function mapDispatchToProps (dispatch, { navigation }) {
   return {
-    
+    startQuiz: (questions) => dispatch(initializeQuiz({ questions })) 
   }
 }
 

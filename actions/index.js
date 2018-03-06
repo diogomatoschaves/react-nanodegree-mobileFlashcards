@@ -7,8 +7,10 @@ export const ADD_DECK_TITLE = 'ADD_DECK_TITLE'
 export const ADD_CARD_TO_DECK = 'ADD_CARD_TO_DECK'
 export const GET_DECKS = 'GET_DECKS'
 export const GET_DECK = 'GET_DECK'
-export const ADD_CARD_TO_QUIZ = 'ADD_CARD_TO_QUIZ'
+export const INITIALIZE_QUIZ = 'INITIALIZE_QUIZ'
+export const REMOVE_CARD_FROM_QUIZ = 'REMOVE_CARD_FROM_QUIZ'
 export const RESET_QUIZ = 'RESET_QUIZ'
+export const UPDATE_SCORE = 'UPDATE_SCORE'
 
 export function addDeckTitle ({ newDeck, deckTitle }) {
   return (dispatch) => {
@@ -73,10 +75,24 @@ export function getDeckStore ({ deck, deckTitle }) {
   }
 }
 
-export function addCardToQuiz ({ question }) {
+export function initializeQuiz ({ questions }) {
   return {
-    type: ADD_CARD_TO_QUIZ,
-    question
+    type: INITIALIZE_QUIZ,
+    questions
+  }
+}
+
+export function removeCardFromQuiz ({ card }) {
+  return {
+    type: REMOVE_CARD_FROM_QUIZ,
+    card
+  }
+}
+
+export function updateScore ({ scoreType }) {
+  return {
+    type: UPDATE_SCORE,
+    scoreType
   }
 }
 

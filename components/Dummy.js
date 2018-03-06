@@ -3,12 +3,12 @@
  */
 
 import React, { Component } from 'react'
-import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity, Easing } from 'react-native'
+import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity, Animated } from 'react-native'
 import { connect } from 'react-redux'
 import Button from './Button'
 import { AppLoading } from 'expo'
 import { removeCardFromQuiz, updateScore } from '../actions/index'
-import FlipView from 'react-native-flip-view-next'
+import { FlipView } from 'react-native-flip-view-next'
 // var FlipView = require('react-native-flip-view');
 
 
@@ -27,6 +27,39 @@ class DeckView extends Component {
     isFlipped: false
   }
 
+  componentWillMount() {
+    this.animatedValue = new Animated.Value(0);
+    this.value = 0;
+    this.animatedValue.addListener(({ value }) => {
+      this.value = value;
+    })
+    this.frontInterpolate = this.animatedValue.interpolate({
+      inputRange: [0, 180],
+      outputRange: ['0deg', '180deg'],
+    })
+    this.backInterpolate = this.animatedValue.interpolate({
+      inputRange: [0, 180],
+      outputRange: ['180deg', '360deg']
+    })
+  }
+
+  flipCard() {
+    if (this.value >= 90) {
+      Animated.spring(this.animatedValue,{
+        toValue: 0,
+        friction: 8,
+        tension: 10
+      }).start();
+    } else {
+      Animated.spring(this.animatedValue,{
+        toValue: 180,
+        friction: 8,
+        tension: 10
+      }).start();
+    }
+
+  }
+
   componentDidMount() {
     const quizQuestion = this.props.quizQuestions.pop()
     this.setState({ quizQuestion })
@@ -34,92 +67,28 @@ class DeckView extends Component {
   }
 
   onPressCorrect = () => {
-    if (this.state.quizQuestion.answer === true) {
-      this.props.updateScore('correct')
-    } else {
-      this.props.updateScore('incorrect')
-    }
-
-    this.setState({ isflipped: !this.state.isflipped })
+    this.props.updateScore('correct')
   }
 
   onPressIncorrect = () => {
-    if (this.state.quizQuestion.answer === false) {
-      this.props.updateScore('correct')
-    } else {
-      this.props.updateScore('incorrect')
-    }
-
-    this.setState({ isflipped: !this.state.isflipped })
+    this.props.updateScore('incorrect')
   }
 
   onPressNext = () => {
 
   }
 
-  _renderFront = () => {
-
-    const { quizQuestion } = this.state
-
-    return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <Text style={styles.text} >{quizQuestion.question}</Text>
-          <TouchableOpacity
-            style={{marginBottom: 20}}
-            onPress={() => {
-              this.setState({ isFlipped: !this.state.isFlipped})
-            }}
-          >
-            <Text style={{fontSize: 15, textAlign: 'center', color: 'red'}}>Answer</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonsContainer}>
-          <Button
-            btnStyle={Platform.OS === 'ios' ? styles.iosCorrectBtn : styles.androidCorrectBtn}
-            textStyle={styles.correctBtnText}
-            onPress={this.onPressCorrect}
-            text={'Correct'}
-          />
-          <Button
-            btnStyle={Platform.OS === 'ios' ? styles.iosIncorrectBtn : styles.androidIncorrectBtn}
-            textStyle={styles.incorrectBtnText}
-            onPress={this.onPressIncorrect}
-            text={'Incorrect'}
-          />
-        </View>
-      </ScrollView>
-    )
-  }
-
-  _renderBack = () => {
-    const { quizQuestion } = this.state
-    return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
-        <View style={{flex: 1, justifyContent: 'center'}}>
-          <Text style={[styles.text, {fontSize: 30}]}>
-            {quizQuestion.answer}
-          </Text>
-          <TouchableOpacity
-            style={{marginBottom: 20}}
-            onPress={() => {
-              this.setState({ isFlipped: !this.state.isFlipped})
-            }}
-          >
-            <Text style={{fontSize: 15, textAlign: 'center', color: 'red'}}>Question</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonsContainer}>
-          <Button
-            btnStyle={Platform.OS === 'ios' ? styles.iosNextBtn : styles.androidNextBtn}
-            textStyle={styles.nextBtnText}
-            onPress={this.onPressNext}
-            text={'Next'}
-          />
-        </View>
-      </ScrollView>
-    )
-  }
+  // _renderFront = () => {
+  //   return (
+  //
+  //   )
+  // }
+  //
+  // _renderBack = () => {
+  //   const { quizQuestion } = this.state
+  //
+  //   )
+  // }
 
   render() {
 
@@ -134,17 +103,72 @@ class DeckView extends Component {
       )
     }
 
+    const frontAnimatedStyle = {
+      transform: [
+        { rotateY: this.frontInterpolate},
+        {perspective: 1000}
+      ]
+    }
+    const backAnimatedStyle = {
+      transform: [
+        { rotateY: this.backInterpolate },
+        {perspective: 1000}
+      ]
+    }
+
     return (
-      <FlipView
-        style={{flex: 1}}
-        front={this._renderFront()}
-        back={this._renderBack()}
-        isFlipped={this.state.isFlipped}
-        onFlipped={(val) => {console.log('Flipped: ' + val);}}
-        flipAxis="y"
-        flipEasing={Easing.out(Easing.ease)}
-        flipDuration={500}
-        perspective={1000}/>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
+          <Animated.View style={[styles.flipCard, frontAnimatedStyle]}>
+            <View style={{flex: 1, justifyContent: 'center'}}>
+              <Text style={styles.text} >{quizQuestion.question}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({ isFlipped: !this.state.isFlipped})
+                  this.flipCard()
+                }}
+              >
+                <Text style={{fontSize: 15, textAlign: 'center', color: 'red'}}>Answer</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonsContainer}>
+              <Button
+                btnStyle={Platform.OS === 'ios' ? styles.iosCorrectBtn : styles.androidCorrectBtn}
+                textStyle={styles.correctBtnText}
+                onPress={this.onPressCorrect}
+                text={'Correct'}
+              />
+              <Button
+                btnStyle={Platform.OS === 'ios' ? styles.iosIncorrectBtn : styles.androidIncorrectBtn}
+                textStyle={styles.incorrectBtnText}
+                onPress={this.onPressIncorrect}
+                text={'Incorrect'}
+              />
+            </View>
+          </Animated.View>
+          <Animated.View style={[backAnimatedStyle, styles.flipCard, styles.flipCardBack]}>
+            <View style={{flex: 1, justifyContent: 'center'}}>
+              <Text style={styles.flipText}>
+                {quizQuestion.answer}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState({ isFlipped: !this.state.isFlipped})
+                  this.flipCard()
+                }}
+              >
+                <Text style={{fontSize: 15, textAlign: 'center', color: 'red'}}>Question</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonsContainer}>
+              <Button
+                btnStyle={Platform.OS === 'ios' ? styles.iosNextBtn : styles.androidNextBtn}
+                textStyle={styles.nextBtnText}
+                onPress={this.onPressNext}
+                text={'Next'}
+              />
+            </View>
+          </Animated.View>
+      </ScrollView>
     )
   }
 }
@@ -247,7 +271,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start'
   },
   text: {
-    fontSize: 40,
+    fontSize: 60,
     textAlign: 'center',
     marginTop: 80,
     marginBottom: 30,

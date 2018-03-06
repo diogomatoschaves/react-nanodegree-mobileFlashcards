@@ -2,8 +2,8 @@
  * Created by diogomatoschaves on 04/03/2018.
  */
 
-import { ADD_CARD_TO_DECK, ADD_DECK_TITLE,
-  GET_DECK, GET_DECKS, ADD_CARD_TO_QUIZ, RESET_QUIZ } from '../actions/index'
+import { ADD_CARD_TO_DECK, ADD_DECK_TITLE, GET_DECK, GET_DECKS, 
+  INITIALIZE_QUIZ, REMOVE_CARD_FROM_QUIZ, RESET_QUIZ, UPDATE_SCORE } from '../actions/index'
 import { combineReducers } from 'redux'
 
 
@@ -37,17 +37,46 @@ function decks (state = {}, action) {
   }
 }
 
-function quiz (state = {questions: []}, action) {
+function quiz (state = {questions: [], score: {correct: 0, incorrect: 0}}, action) {
   switch (action.type) {
-    case ADD_CARD_TO_QUIZ :
+    case INITIALIZE_QUIZ :
       return {
         ...state,
-        questions: [...state.questions, action.question]
+        questions: action.questions
+      }
+    case REMOVE_CARD_FROM_QUIZ :
+      return {
+        ...state,
+        questions: Object.keys(state.questions).reduce((accumulator, item) => {
+          if (action.card !== item) {
+            accumulator = [...accumulator, item]
+          }
+          return accumulator
+        }, [])
+      }
+    case UPDATE_SCORE :
+      if (action.scoreType === 'correct') {
+        return {
+          ...state,
+          score: {
+            ...state.score,
+            correct: state.score.correct + 1
+          }
+        }
+      } else {
+        return {
+          ...state,
+          score: {
+            ...state.score,
+            incorrect: state.score.incorrect + 1
+          }
+        }
       }
     case RESET_QUIZ :
       return {
         ...state,
-        questions: []
+        questions: [],
+        score: {correct: 0, incorrect: 0}
       }
     default :
       return state
