@@ -12,11 +12,11 @@ There, the user can choose to repeat the quiz or to go back to the initial deck 
 
 The app's functionality was implemented using React v.16.2.0, React Native v.0.52.0, and Redux v.3.7.2.
 
-The app has been tested for IOS platforms.
+The app has been tested for iOS platforms.
 
 ## Prerequisites
 
-You need to have npm installed on your computer, as well as expo app installed on an iphone or an ios emulator on a computer.
+You need to have npm installed on your computer, as well as expo app installed on an iOS device or an iOS emulator.
 
 ## Installing & Usage
 
