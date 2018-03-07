@@ -3,14 +3,38 @@
  */
 
 import React, { Component } from 'react'
-import { View, Text, StyleSheet, Platform, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import Button from './Button'
 import { AppLoading } from 'expo'
 import { NavigationActions } from 'react-navigation'
+import { initializeQuiz } from '../actions/index'
+import { FontAwesome } from '@expo/vector-icons'
 
 
 class Results extends Component {
+
+  static navigationOptions = ({ navigation }) => {
+    const {title} = navigation.state.params
+
+    return {
+      title,
+      headerLeft: () => (
+        <TouchableOpacity
+          style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row', margin: 0}}
+          onPress={() => navigation.navigate('DeckView', { title })}
+        >
+          <FontAw8esome
+            name={'angle-left'}
+            style={{color: 'white', marginLeft: 6, marginRight: 6, paddingBottom: 2}}
+            size={37}
+          />
+          <Text style={{color: 'white', fontSize: 17}}>
+            Deck
+          </Text>
+        </TouchableOpacity>),
+    }
+  }
 
   state = {
     correctPercentage: null
@@ -31,13 +55,17 @@ class Results extends Component {
 
   }
 
-  onPressBtn = () => {
-    this.props.navigation.dispatch(
-      NavigationActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({ routeName: 'Home' })]
-      })
-    )
+  onPressDeckView = () => {
+    const { title } = this.props
+    this.props.navigation.navigate('DeckView', { title })
+  }
+
+  onPressRestart = () => {
+    const { title, questions, startQuiz } = this.props
+    
+    startQuiz(questions)
+    
+    this.props.navigation.navigate('Quiz', { title })
   }
 
   render() {
@@ -63,9 +91,16 @@ class Results extends Component {
         <View style={styles.buttonsContainer}>
           <Button
             btnStyle={Platform.OS === 'ios' ? styles.iosBtn : styles.androidBtn}
+            textStyle={[styles.btnText, { color: 'black'}]}
+            onPress={this.onPressDeckView}
+            text={'Go to Deck'}
+            extraStyle={{backgroundColor: 'white', marginTop: 30}}
+          />
+          <Button
+            btnStyle={Platform.OS === 'ios' ? styles.iosBtn : styles.androidBtn}
             textStyle={styles.btnText}
-            onPress={this.onPressBtn}
-            text={'Finish'}
+            onPress={this.onPressRestart}
+            text={'Restart Quiz'}
           />
         </View>
       </ScrollView>
@@ -112,7 +147,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.8,
     marginLeft: 40,
     marginRight: 40,
-    marginTop: 30,
+    marginTop: 10,
     marginBottom: 10,
   },
   androidBtn: {
@@ -133,10 +168,21 @@ const styles = StyleSheet.create({
   },
 })
 
-function mapStateToProps ({ quiz }) {
+function mapStateToProps ({ decks, quiz }, { navigation }) {
+  
+  const { title } = navigation.state.params
+  
   return {
-    score: quiz.score
+    title,
+    score: quiz.score,
+    questions: decks[title].questions
   }
 }
 
-export default connect(mapStateToProps)(Results)
+function mapDispatchToProps (dispatch, { navigation }) {
+  return {
+    startQuiz: (questions) => dispatch(initializeQuiz({ questions })) 
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Results)

@@ -3,21 +3,42 @@
  */
 
 import React, { Component } from 'react'
-import { View, Text, StyleSheet, Platform, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Platform, ScrollView, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import Button from './Button'
 import { AppLoading } from 'expo'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scrollview'
 import { initializeQuiz } from '../actions/index'
+import { Entypo, FontAwesome } from '@expo/vector-icons'
+import { NavigationActions } from 'react-navigation'
 
 
 class DeckView extends Component {
   
   static navigationOptions = ({ navigation }) => {
-    const { title } = navigation.state.params.item
+    const { title } = navigation.state.params
 
     return {
-      title
+      title,
+      headerLeft: () => (
+        <TouchableOpacity
+          style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row', margin: 0}}
+          onPress={ () =>
+            navigation.dispatch(NavigationActions.reset({
+              index: 0,
+              actions: [NavigationActions.navigate({ routeName: 'Home' })]
+            }))
+          }
+        >
+          <FontAwesome
+            name={'angle-left'}
+            style={{color: 'white', marginLeft: 6, marginRight: 6, paddingBottom: 2}}
+            size={37}
+          />
+          <Text style={{color: 'white', fontSize: 17}}>
+            Home
+          </Text>
+        </TouchableOpacity>),
     }
   }
 
@@ -32,6 +53,18 @@ class DeckView extends Component {
       this.setState({ disabled: true})
     } else {
       this.setState({ disabled: false})
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { questions } = this.props
+
+    if (prevProps.questions !== this.props.questions) {
+      if (questions.length === 0) {
+        this.setState({ disabled: true})
+      } else {
+        this.setState({ disabled: false})
+      }
     }
   }
   
@@ -170,7 +203,7 @@ const styles = StyleSheet.create({
 
 function mapStateToProps({ decks }, { navigation }) {
 
-  const { title } = navigation.state.params.item;
+  const { title } = navigation.state.params;
 
   return {
     title,

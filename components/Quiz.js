@@ -10,7 +10,7 @@ import { AppLoading } from 'expo'
 import { removeCardFromQuiz, updateScore } from '../actions/index'
 import FlipView from 'react-native-flip-view-next'
 import { NavigationActions } from 'react-navigation'
-import { Entypo } from '@expo/vector-icons'
+import { FontAwesome } from '@expo/vector-icons'
 
 
 class Quiz extends Component {
@@ -19,22 +19,22 @@ class Quiz extends Component {
     const { title } = navigation.state.params
 
     return {
-      title: 'Back',
+      title,
       headerLeft: () => (
-        <Entypo
-          name={'chevron-left'}
-          style={{color: 'white'}}
-          onPress={ () =>
-            navigation.dispatch(NavigationActions.reset({
-              index: 0,
-              actions: [NavigationActions.navigate({ routeName: 'Home' })]
-            }))
-          }
-          size={35}
-        />),
-      // headerStyle: styles.leftArrow
+        <TouchableOpacity
+          style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row', margin: 0}}
+          onPress={() => navigation.navigate('DeckView', { title })}
+        >
+          <FontAwesome
+            name={'angle-left'}
+            style={{color: 'white', marginLeft: 6, marginRight: 6, paddingBottom: 2}}
+            size={37}
+          />
+          <Text style={{color: 'white', fontSize: 17}}>
+            Deck
+          </Text>
+        </TouchableOpacity>),
     }
-        // title: 'Back',
   }
 
   state = {
@@ -97,10 +97,18 @@ class Quiz extends Component {
   }
 
   onPressNext = () => {
+    if (!this.state.answered) {
+      this.props.updateScore('incorrect')
+      this.setState({ answered: true, correct: false })
+    }
     this.props.navigation.navigate('Quiz', {title: this.props.title})
   }
 
   onPressFinish = () => {
+    if (!this.state.answered) {
+      this.props.updateScore('incorrect')
+      this.setState({ answered: true, correct: false })
+    }
     this.props.navigation.navigate('Results', {title: this.props.title})
   }
 
@@ -123,7 +131,7 @@ class Quiz extends Component {
               this.setState({ isFlipped: !this.state.isFlipped})
             }}
           >
-            <Text style={{fontSize: 20, textAlign: 'center', color: 'red'}}>Answer</Text>
+            <Text style={{fontSize: 20, textAlign: 'center', color: 'red'}}>Show Answer</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonsContainer}>
@@ -171,7 +179,7 @@ class Quiz extends Component {
               this.setState({ isFlipped: !this.state.isFlipped})
             }}
           >
-            <Text style={{fontSize: 20, textAlign: 'center', color: 'red'}}>Question</Text>
+            <Text style={{fontSize: 20, textAlign: 'center', color: 'red'}}>Show Question</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonsContainer}>
@@ -332,8 +340,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
-    // alignItems: 'center',
-    // justifyContent: 'space-around',
   },
   contentContainerStyle: {
     alignItems: 'stretch',

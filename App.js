@@ -78,7 +78,6 @@ const MainNavigator = StackNavigator({
       headerTintColor: 'white',
       headerStyle: {
         backgroundColor: 'black',
-        alignSelf: 'flex-start',
         paddingLeft: 0
       },
     }
