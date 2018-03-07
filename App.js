@@ -122,7 +122,7 @@ export default class App extends React.Component {
   componentDidMount() {
     // AsyncStorage.clear()
     setInitialStorage()
-    Permissions.askAsync(Permissions.NOTIFICATIONS)
+    // Permissions.askAsync(Permissions.NOTIFICATIONS)
   }
   
   render() {
