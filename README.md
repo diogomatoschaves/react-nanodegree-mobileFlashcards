@@ -1,4 +1,4 @@
-# Readable Project - Udacity's React Nanodegree 2nd Project
+# Mobile Flashcards Project - Udacity's React Nanodegree 3rd Project
 
 This is an implementation of Udacity's React Nanodegree's Mobile Flashcards React Native project.
 
