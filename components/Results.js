@@ -10,6 +10,7 @@ import { AppLoading } from 'expo'
 import { NavigationActions } from 'react-navigation'
 import { initializeQuiz } from '../actions/index'
 import { FontAwesome } from '@expo/vector-icons'
+import { setLocalNotification, clearLocalNotification } from '../utils/helpers'
 
 
 class Results extends Component {
@@ -24,7 +25,7 @@ class Results extends Component {
           style={{flex: 1, justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'row', margin: 0}}
           onPress={() => navigation.navigate('DeckView', { title })}
         >
-          <FontAw8esome
+          <FontAwesome
             name={'angle-left'}
             style={{color: 'white', marginLeft: 6, marginRight: 6, paddingBottom: 2}}
             size={37}
@@ -44,14 +45,12 @@ class Results extends Component {
   componentDidMount() {
 
     const { score } = this.props
-
-      // if (prevProps.score !== score) {
-
-      // debugger;
-
     const correctPercentage = ((score.correct / (score.correct + score.incorrect)) * 100).toFixed(0)
 
     this.setState({ correctPercentage })
+    
+    clearLocalNotification()
+      .then(setLocalNotification())
 
   }
 

@@ -12,7 +12,7 @@ import AddCard from './components/AddCard.js'
 import Quiz from './components/Quiz.js'
 import Results from './components/Results.js'
 import NewDeck from './components/NewDeck.js'
-import { Constants } from 'expo'
+import { Constants, Permissions } from 'expo'
 import { TabNavigator, StackNavigator } from 'react-navigation'
 import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons'
 
@@ -122,6 +122,7 @@ export default class App extends React.Component {
   componentDidMount() {
     // AsyncStorage.clear()
     setInitialStorage()
+    Permissions.askAsync(Permissions.NOTIFICATIONS)
   }
   
   render() {

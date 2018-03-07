@@ -30,6 +30,20 @@ function createNotification () {
   }
 }
 
+export function getTodayItem () {
+  AsyncStorage.getItem(NOTIFICATION_KEY)
+    .then(JSON.parse)
+    .then((data) => {
+      return data.alreadyMadeQuiz
+    })
+}
+
+export function setTodayItem () {
+  AsyncStorage.mergeItem(NOTIFICATION_KEY, JSON.stringify({
+    alreadyMadeQuiz: true
+  }))
+}
+
 export function setLocalNotification () {
   AsyncStorage.getItem(NOTIFICATION_KEY)
     .then(JSON.parse)
@@ -42,7 +56,7 @@ export function setLocalNotification () {
 
               let tomorrow = new Date()
               tomorrow.setDate(tomorrow.getDate() + 1)
-              tomorrow.setHours(20)
+              tomorrow.setHours(17)
               tomorrow.setMinutes(0)
 
               Notifications.scheduleLocalNotificationAsync(
