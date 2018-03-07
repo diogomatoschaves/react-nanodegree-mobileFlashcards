@@ -10,6 +10,7 @@ import DecksList from './components/DecksList.js'
 import DeckView from './components/DeckView.js'
 import AddCard from './components/AddCard.js'
 import Quiz from './components/Quiz.js'
+import Results from './components/Results.js'
 import NewDeck from './components/NewDeck.js'
 import { Constants } from 'expo'
 import { TabNavigator, StackNavigator } from 'react-navigation'
@@ -96,6 +97,17 @@ const MainNavigator = StackNavigator({
     screen: Quiz,
     navigationOptions: {
       title: 'Quiz',
+      headerTintColor: 'white',
+      headerStyle: {
+        backgroundColor: 'black',
+        paddingLeft: 0
+      },
+    }
+  },
+  Results: {
+    screen: Results,
+    navigationOptions: {
+      title: 'Results',
       headerTintColor: 'white',
       headerStyle: {
         backgroundColor: 'black',

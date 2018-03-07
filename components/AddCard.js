@@ -3,7 +3,7 @@
  */
 
 import React, { Component } from 'react'
-import { KeyboardAvoidingView, Text, Keyboard,
+import { KeyboardAvoidingView, Text, Keyboard, View,
   StyleSheet, TextInput, Platform, TouchableWithoutFeedback } from 'react-native'
 import Button from './Button'
 import Input from './Input'
@@ -23,7 +23,7 @@ class AddCard extends Component {
 
   state = {
     question: '',
-    answer: '',
+    answer: true,
     disabled: true,
   };
 
@@ -32,18 +32,18 @@ class AddCard extends Component {
 
     this.setState(() => ({
       question: text,
-      disabled: !Boolean(text) || !Boolean(answer)
+      disabled: !Boolean(text)
     }))
   }
 
-  updateAnswer = ({ text }) => {
-    const { question } = this.state
-
-    this.setState(() => ({
-      answer: text,
-      disabled: !Boolean(text) || !Boolean(question)
-    }))
-  }
+  // updateAnswer = ({ text }) => {
+  //   const { question } = this.state
+  //
+  //   this.setState(() => ({
+  //     answer: text,
+  //     disabled: !Boolean(text) || !Boolean(question)
+  //   }))
+  // }
 
   onSubmit = () => {
     if (!this.state.disabled) {
@@ -66,16 +66,29 @@ class AddCard extends Component {
               styles={Platform.OS === 'ios' ? styles.iosTextInput : styles.androidTextInput}
               updateText={this.updateQuestion}
               value={this.state.question}
-              placeholder={'Question'}
+              placeholder={'Question or statement'}
               autoFocus={true}
             />
-            <Input
-              styles={Platform.OS === 'ios' ? styles.iosTextInput : styles.androidTextInput}
-              updateText={this.updateAnswer}
-              value={this.state.answer}
-              placeholder={'Answer'}
-              autoFocus={true}
-            />
+            <View style={styles.btnsContainer}>
+              <Button
+                btnStyle={Platform.OS === 'ios' ? styles.iosTrueFalseBtn : styles.androidTrueFalseBtn}
+                textStyle={styles.submitBtnText}
+                text={'True'}
+                activeOpacity={!this.state.answer ? 1 : 0.2}
+                onPress={() => this.setState({ answer: true})}
+                extraStyle={this.state.answer ? {backgroundColor: 'green'} : styles.selectedBtn}
+                elevation={this.state.answer ? 10 : 0}
+              />
+              <Button
+                btnStyle={Platform.OS === 'ios' ? styles.iosTrueFalseBtn : styles.androidTrueFalseBtn}
+                textStyle={styles.submitBtnText}
+                text={'False'}
+                activeOpacity={this.state.answer ? 1 : 0.2}
+                onPress={() => this.setState({ answer: false})}
+                extraStyle={!this.state.answer ? {backgroundColor: 'red'} : styles.selectedBtn}
+                elevation={!this.state.answer ? 10 : 0}
+              />
+            </View>
             <Button
               btnStyle={Platform.OS === 'ios' ? styles.iosSubmitBtn : styles.androidSubmitBtn}
               textStyle={styles.submitBtnText}
@@ -160,6 +173,45 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: 'center'
   },
+  btnsContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center'
+  },
+  iosTrueFalseBtn: {
+    padding: 15,
+    paddingLeft: 40,
+    paddingRight: 40,
+    borderRadius: 7,
+    borderColor: 'black',
+    borderWidth: 0.8,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 40,
+    marginBottom: 10,
+  },
+  androidTrueFalseBtn: {
+    padding: 10,
+    borderRadius: 2,
+    height: 45,
+    paddingLeft: 40,
+    paddingRight: 40,
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  selectedBtn: {
+    elevation: 10,
+    backgroundColor: 'gray',
+    shadowRadius: 3,
+    shadowOpacity: 0.7,
+    shadowColor: 'rgba(0, 0, 0, 0.9)',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    }
+  }
 })
 
 function mapStateToProps(state, { navigation }) {

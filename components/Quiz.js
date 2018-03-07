@@ -9,60 +9,112 @@ import Button from './Button'
 import { AppLoading } from 'expo'
 import { removeCardFromQuiz, updateScore } from '../actions/index'
 import FlipView from 'react-native-flip-view-next'
-// var FlipView = require('react-native-flip-view');
+import { NavigationActions } from 'react-navigation'
+import { Entypo } from '@expo/vector-icons'
 
 
-class DeckView extends Component {
+class Quiz extends Component {
 
-  // static navigationOptions = ({ navigation }) => {
-  //   const { title } = navigation.state.params
-  //
-  //   return {
-  //     title
-  //   }
-  // }
+  static navigationOptions = ({ navigation }) => {
+    const { title } = navigation.state.params
+
+    return {
+      title: 'Back',
+      headerLeft: () => (
+        <Entypo
+          name={'chevron-left'}
+          style={{color: 'white'}}
+          onPress={ () =>
+            navigation.dispatch(NavigationActions.reset({
+              index: 0,
+              actions: [NavigationActions.navigate({ routeName: 'Home' })]
+            }))
+          }
+          size={35}
+        />),
+      // headerStyle: styles.leftArrow
+    }
+        // title: 'Back',
+  }
 
   state = {
     quizQuestion: null,
-    isFlipped: false
+    isFlipped: false,
+    correct: null,
+    answered: false,
+    next: true
   }
 
-  componentDidMount() {
-    const quizQuestion = this.props.quizQuestions.pop()
+  componentWillMount() {
+    const { remainingCards, doneCards } = this.props
+
+    const quizQuestion = remainingCards[0]
     this.setState({ quizQuestion })
     this.props.removeCard(quizQuestion)
+    
+  }
+
+  componentDidUpdate(prevProps) {
+
+    const { remainingCards, doneCards } = this.props
+
+    if (prevProps.doneCards !== doneCards && !this.state.answered) {
+      const cardNumber = doneCards.length
+      const totalCards = remainingCards.length + cardNumber
+
+      if (cardNumber === totalCards){
+        this.setState({cardNumber, totalCards, next: false})
+      } else {
+        this.setState({cardNumber, totalCards})
+      }
+    }
   }
 
   onPressCorrect = () => {
-    if (this.state.quizQuestion.answer === true) {
-      this.props.updateScore('correct')
-    } else {
-      this.props.updateScore('incorrect')
-    }
+    if (!this.state.answered) {
+      if (this.state.quizQuestion.answer === true) {
+        this.setState({ answered: true, correct: true })
+        this.props.updateScore('correct')
+      } else {
+        this.setState({ answered: true, correct: false })
+        this.props.updateScore('incorrect')
+    }}
 
-    this.setState({ isflipped: !this.state.isflipped })
+    this.setState({ isFlipped: !this.state.isFlipped })
   }
 
   onPressIncorrect = () => {
-    if (this.state.quizQuestion.answer === false) {
-      this.props.updateScore('correct')
-    } else {
-      this.props.updateScore('incorrect')
-    }
+    if (!this.state.answered) {
+      if (this.state.quizQuestion.answer === false) {
+        this.props.updateScore('correct')
+        this.setState({ answered: true, correct: true })
+      } else {
+        this.setState({ answered: true, correct: false })
+        this.props.updateScore('incorrect')
+    }}
 
-    this.setState({ isflipped: !this.state.isflipped })
+    this.setState({ isFlipped: !this.state.isFlipped })
   }
 
   onPressNext = () => {
+    this.props.navigation.navigate('Quiz', {title: this.props.title})
+  }
 
+  onPressFinish = () => {
+    this.props.navigation.navigate('Results', {title: this.props.title})
   }
 
   _renderFront = () => {
 
-    const { quizQuestion } = this.state
+    const { quizQuestion, totalCards, cardNumber } = this.state
+
+    // debugger;
 
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
+        {cardNumber !== 0 && (
+          <Text style={{fontSize: 20, padding: 20}}>{cardNumber}/{totalCards} </Text>
+        )}
         <View style={{flex: 1, justifyContent: 'center'}}>
           <Text style={styles.text} >{quizQuestion.question}</Text>
           <TouchableOpacity
@@ -71,7 +123,7 @@ class DeckView extends Component {
               this.setState({ isFlipped: !this.state.isFlipped})
             }}
           >
-            <Text style={{fontSize: 15, textAlign: 'center', color: 'red'}}>Answer</Text>
+            <Text style={{fontSize: 20, textAlign: 'center', color: 'red'}}>Answer</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonsContainer}>
@@ -80,12 +132,16 @@ class DeckView extends Component {
             textStyle={styles.correctBtnText}
             onPress={this.onPressCorrect}
             text={'Correct'}
+            extraStyle={this.state.answered ? {backgroundColor: 'gray'} : {}}
+            activeOpacity={this.state.answered ? 1 : 0.2}
           />
           <Button
             btnStyle={Platform.OS === 'ios' ? styles.iosIncorrectBtn : styles.androidIncorrectBtn}
             textStyle={styles.incorrectBtnText}
             onPress={this.onPressIncorrect}
             text={'Incorrect'}
+            extraStyle={this.state.answered ? {backgroundColor: 'gray'} : {}}
+            activeOpacity={this.state.answered ? 1 : 0.2}
           />
         </View>
       </ScrollView>
@@ -93,12 +149,21 @@ class DeckView extends Component {
   }
 
   _renderBack = () => {
-    const { quizQuestion } = this.state
+    const { quizQuestion, next } = this.state
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
         <View style={{flex: 1, justifyContent: 'center'}}>
+          {this.state.answered &&
+            (this.state.correct
+            ? (<Text style={{fontSize: 15, color: 'green', textAlign: 'center', padding: 30}}>Correct!</Text>)
+            : (<Text style={{fontSize: 15, color: 'red', textAlign: 'center', padding: 30}}>Incorrect...</Text>)
+            )}
           <Text style={[styles.text, {fontSize: 30}]}>
-            {quizQuestion.answer}
+            {quizQuestion.answer ? (
+              <Text>Yes!</Text>
+            ) : (
+              <Text>No!</Text>
+            )}
           </Text>
           <TouchableOpacity
             style={{marginBottom: 20}}
@@ -106,16 +171,26 @@ class DeckView extends Component {
               this.setState({ isFlipped: !this.state.isFlipped})
             }}
           >
-            <Text style={{fontSize: 15, textAlign: 'center', color: 'red'}}>Question</Text>
+            <Text style={{fontSize: 20, textAlign: 'center', color: 'red'}}>Question</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonsContainer}>
-          <Button
-            btnStyle={Platform.OS === 'ios' ? styles.iosNextBtn : styles.androidNextBtn}
-            textStyle={styles.nextBtnText}
-            onPress={this.onPressNext}
-            text={'Next'}
-          />
+          {next ? (
+            <Button
+              btnStyle={Platform.OS === 'ios' ? styles.iosNextBtn : styles.androidNextBtn}
+              textStyle={styles.nextBtnText}
+              onPress={this.onPressNext}
+              text={'Next'}
+            />
+          ) : (
+            <Button
+              btnStyle={Platform.OS === 'ios' ? styles.iosNextBtn : styles.androidNextBtn}
+              textStyle={styles.nextBtnText}
+              onPress={this.onPressFinish}
+              text={'Results'}
+            />
+          )}
+
         </View>
       </ScrollView>
     )
@@ -123,7 +198,7 @@ class DeckView extends Component {
 
   render() {
 
-    const { title, questions } = this.props
+    const { title } = this.props
     const { quizQuestion } = this.state
 
     // debugger;
@@ -249,8 +324,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 40,
     textAlign: 'center',
-    marginTop: 80,
-    marginBottom: 30,
+    marginTop: 50,
+    marginBottom: 50,
     marginLeft: 10,
     marginRight: 10,
   },
@@ -264,23 +339,6 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'space-around',
   },
-  flipCard: {
-    // width: 200,
-    // height: 200,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backfaceVisibility: 'hidden',
-  },
-  flipCardBack: {
-    backgroundColor: "green",
-    position: "absolute",
-    top: 0,
-    alignSelf: 'center',
-    left: 0,
-    right: 0,
-    // height: 300
-  },
   flipText: {
     fontSize: 60,
     textAlign: 'center',
@@ -288,21 +346,17 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
   },
-  flipBackCard: {
-    position: "absolute",
-    top: 0,
-    margin:0
-  },
+
 })
 
-function mapStateToProps({ decks, quiz }, { navigation }) {
+function mapStateToProps({ quiz }, { navigation }) {
 
   const { title } = navigation.state.params;
 
   return {
     title,
-    quizQuestions: quiz.questions,
-    questions: decks[title].questions
+    remainingCards: quiz.remainingCards,
+    doneCards: quiz.doneCards,
   }
 }
 
@@ -313,5 +367,5 @@ function mapDispatchToProps (dispatch, { navigation }) {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DeckView)
+export default connect(mapStateToProps, mapDispatchToProps)(Quiz)
 

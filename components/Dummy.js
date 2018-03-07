@@ -339,3 +339,10 @@ function mapDispatchToProps (dispatch, { navigation }) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeckView)
 
+// <Input
+//               styles={Platform.OS === 'ios' ? styles.iosTextInput : styles.androidTextInput}
+//               updateText={this.updateAnswer}
+//               value={this.state.answer}
+//               placeholder={'Answer'}
+//               autoFocus={true}
+//             />

@@ -37,22 +37,28 @@ function decks (state = {}, action) {
   }
 }
 
-function quiz (state = {questions: [], score: {correct: 0, incorrect: 0}}, action) {
+function quiz (state = {remainingCards: [], doneCards: [], score: {correct: 0, incorrect: 0}}, action) {
   switch (action.type) {
     case INITIALIZE_QUIZ :
       return {
         ...state,
-        questions: action.questions
+        remainingCards: action.questions,
+        doneCards: [],
+        score: {correct: 0, incorrect: 0}
       }
     case REMOVE_CARD_FROM_QUIZ :
       return {
         ...state,
-        questions: Object.keys(state.questions).reduce((accumulator, item) => {
+        remainingCards: state.remainingCards.reduce((accumulator, item) => {
+          let newAccumulator;
           if (action.card !== item) {
-            accumulator = [...accumulator, item]
+            newAccumulator = [...accumulator, item]
+          } else {
+            newAccumulator = accumulator
           }
-          return accumulator
-        }, [])
+          return newAccumulator
+        }, []),
+        doneCards: [...state.doneCards, action.card]
       }
     case UPDATE_SCORE :
       if (action.scoreType === 'correct') {
@@ -75,7 +81,8 @@ function quiz (state = {questions: [], score: {correct: 0, incorrect: 0}}, actio
     case RESET_QUIZ :
       return {
         ...state,
-        questions: [],
+        remainingCards: [],
+        doneCards: [],
         score: {correct: 0, incorrect: 0}
       }
     default :
