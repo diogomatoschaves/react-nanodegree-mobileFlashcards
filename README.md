@@ -18,7 +18,7 @@ The app has been tested for iOS platforms.
 
 You need to have npm installed on your computer, as well as expo app installed on an iOS device or an iOS emulator.
 
-## Installing & Usage
+## Installation
 
 In order to install this project, first clone or dowload this repository. After navigating to the root directory of the
 project, run:

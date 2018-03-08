@@ -31,7 +31,7 @@ class Quiz extends Component {
             size={37}
           />
           <Text style={{color: 'white', fontSize: 17}}>
-            Deck
+            {title}
           </Text>
         </TouchableOpacity>),
     }
@@ -72,26 +72,19 @@ class Quiz extends Component {
 
   onPressCorrect = () => {
     if (!this.state.answered) {
-      if (this.state.quizQuestion.answer === true) {
-        this.setState({ answered: true, correct: true })
-        this.props.updateScore('correct')
-      } else {
-        this.setState({ answered: true, correct: false })
-        this.props.updateScore('incorrect')
-    }}
+
+      this.setState({ answered: true, correct: true })
+      this.props.updateScore('correct')
+    }
 
     this.setState({ isFlipped: !this.state.isFlipped })
   }
 
   onPressIncorrect = () => {
     if (!this.state.answered) {
-      if (this.state.quizQuestion.answer === false) {
-        this.props.updateScore('correct')
-        this.setState({ answered: true, correct: true })
-      } else {
-        this.setState({ answered: true, correct: false })
-        this.props.updateScore('incorrect')
-    }}
+      this.setState({ answered: true, correct: false })
+      this.props.updateScore('incorrect')
+    }
 
     this.setState({ isFlipped: !this.state.isFlipped })
   }
@@ -166,13 +159,9 @@ class Quiz extends Component {
             ? (<Text style={{fontSize: 15, color: 'green', textAlign: 'center', padding: 30}}>Correct!</Text>)
             : (<Text style={{fontSize: 15, color: 'red', textAlign: 'center', padding: 30}}>Incorrect...</Text>)
             )}
-          <Text style={[styles.text, {fontSize: 30}]}>
-            {quizQuestion.answer ? (
-              <Text>Yes!</Text>
-            ) : (
-              <Text>No!</Text>
-            )}
-          </Text>
+          {quizQuestion.answer && (
+            <Text style={[styles.text, {fontSize: 30}]}>{quizQuestion.answer}</Text>
+          )}
           <TouchableOpacity
             style={{marginBottom: 20}}
             onPress={() => {

@@ -29,11 +29,13 @@ class NewDeck extends Component {
   onSubmit = () => {
     if (!this.state.disabled) {
       const { text } = this.state
-      const { addDeck, goBack } = this.props
+      const { addDeck, goToDeck } = this.props
 
       addDeck({title: text, questions: []}, text)
-
-      goBack()
+      
+      goToDeck(text)
+      
+      this.setState({ text: '', disabled: true})
     }
   }
 
@@ -144,7 +146,7 @@ function mapStateToProps () {
 function mapDispatchToProps (dispatch, { navigation }) {
   return {
     addDeck: (newDeck, deckTitle) => dispatch(addDeckTitle({ newDeck, deckTitle })),
-    goBack: () => navigation.goBack()
+    goToDeck: (title) => navigation.navigate('DeckView', { title })
   }
 }
 

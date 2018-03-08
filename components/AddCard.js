@@ -23,7 +23,7 @@ class AddCard extends Component {
 
   state = {
     question: '',
-    answer: true,
+    answer: '',
     disabled: true,
   };
 
@@ -32,18 +32,18 @@ class AddCard extends Component {
 
     this.setState(() => ({
       question: text,
-      disabled: !Boolean(text)
+      disabled: !Boolean(text) || !Boolean(answer)
     }))
   }
 
-  // updateAnswer = ({ text }) => {
-  //   const { question } = this.state
-  //
-  //   this.setState(() => ({
-  //     answer: text,
-  //     disabled: !Boolean(text) || !Boolean(question)
-  //   }))
-  // }
+  updateAnswer = ({ text }) => {
+    const { question } = this.state
+
+    this.setState(() => ({
+      answer: text,
+      disabled: !Boolean(text) || !Boolean(question)
+    }))
+  }
 
   onSubmit = () => {
     if (!this.state.disabled) {
@@ -69,26 +69,12 @@ class AddCard extends Component {
               placeholder={'Question or statement'}
               autoFocus={true}
             />
-            <View style={styles.btnsContainer}>
-              <Button
-                btnStyle={Platform.OS === 'ios' ? styles.iosTrueFalseBtn : styles.androidTrueFalseBtn}
-                textStyle={styles.submitBtnText}
-                text={'True'}
-                activeOpacity={!this.state.answer ? 1 : 0.2}
-                onPress={() => this.setState({ answer: true})}
-                extraStyle={this.state.answer ? {backgroundColor: 'green'} : styles.selectedBtn}
-                elevation={this.state.answer ? 10 : 0}
-              />
-              <Button
-                btnStyle={Platform.OS === 'ios' ? styles.iosTrueFalseBtn : styles.androidTrueFalseBtn}
-                textStyle={styles.submitBtnText}
-                text={'False'}
-                activeOpacity={this.state.answer ? 1 : 0.2}
-                onPress={() => this.setState({ answer: false})}
-                extraStyle={!this.state.answer ? {backgroundColor: 'red'} : styles.selectedBtn}
-                elevation={!this.state.answer ? 10 : 0}
-              />
-            </View>
+            <Input
+              styles={Platform.OS === 'ios' ? styles.iosTextInput : styles.androidTextInput}
+              updateText={this.updateAnswer}
+              value={this.state.answer}
+              placeholder={'Answer'}
+            />
             <Button
               btnStyle={Platform.OS === 'ios' ? styles.iosSubmitBtn : styles.androidSubmitBtn}
               textStyle={styles.submitBtnText}

@@ -31,7 +31,7 @@ class Results extends Component {
             size={37}
           />
           <Text style={{color: 'white', fontSize: 17}}>
-            Deck
+            {title}
           </Text>
         </TouchableOpacity>),
     }

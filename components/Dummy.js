@@ -346,3 +346,23 @@ export default connect(mapStateToProps, mapDispatchToProps)(DeckView)
 //               placeholder={'Answer'}
 //               autoFocus={true}
 //             />
+
+// <View style={styles.btnsContainer}>
+//               <Button
+//                 btnStyle={Platform.OS === 'ios' ? styles.iosTrueFalseBtn : styles.androidTrueFalseBtn}
+//                 textStyle={styles.submitBtnText}
+//                 text={'True'}
+//                 activeOpacity={!this.state.answer ? 1 : 0.2}
+//                 onPress={() => this.setState({ answer: true})}
+//                 extraStyle={this.state.answer ? {backgroundColor: 'green'} : styles.selectedBtn}
+//                 elevation={this.state.answer ? 10 : 0}
+//               />
+//               <Button
+//                 btnStyle={Platform.OS === 'ios' ? styles.iosTrueFalseBtn : styles.androidTrueFalseBtn}
+//                 textStyle={styles.submitBtnText}
+//                 text={'False'}
+//                 activeOpacity={this.state.answer ? 1 : 0.2}
+//                 onPress={() => this.setState({ answer: false})}
+//                 extraStyle={!this.state.answer ? {backgroundColor: 'red'} : styles.selectedBtn}
+//                 elevation={!this.state.answer ? 10 : 0}
+//               />

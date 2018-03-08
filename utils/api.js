@@ -11,12 +11,12 @@ const initialStorage = {
     title: 'React',
     questions: [
       {
-        question: 'React is a library for managing user interfaces',
-        answer: true
+        question: 'What is React?',
+        answer: 'A library for managing user interfaces'
       },
       {
-        question: 'Is the componentDidMount lifecycle event a good place to make Ajax requests in React?',
-        answer: true
+        question: 'Where do you make Ajax requests in React?',
+        answer: 'The componentDidMount lifecycle event'
       }
     ]
   },
@@ -24,9 +24,8 @@ const initialStorage = {
     title: 'JavaScript',
     questions: [
       {
-        question: 'A closure is the combination of a function and the lexical environment within ' +
-        'which that function was declared',
-        answer: true
+        question: 'What is a closure?',
+        answer: 'The combination of a function and the lexical environment within which that function was declared.'
       }
     ]
   }
